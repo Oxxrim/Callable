@@ -10,6 +10,6 @@ public class Controller {
     private FileService service = new FileServiceImpl();
 
     public void serviceController(String path, String finalPath) throws IOException {
-        service.readFromFolder(path, finalPath);
+        service.readFolders(path, finalPath);
     }
 }

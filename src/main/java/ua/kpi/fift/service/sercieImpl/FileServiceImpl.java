@@ -36,11 +36,42 @@ public class FileServiceImpl implements FileService {
         }
     }*/
 
+    public void readFolders(String path, String finalPath) throws IOException {
+
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+
+        List<Future<String>> list = new ArrayList<Future<String>>();
+
+        String[] folders = path.split("\\\\");
+        String folderPath = "";
+        for (int i = 0; i < folders.length; i++){
+            folderPath += folders[i];
+            Callable<String> callable = new FolderCallable(folderPath, finalPath);
+            Future<String> future = executor.submit(callable);
+            list.add(future);
+            /*readFromFolder(folderPath, finalPath);*/
+            folderPath += "\\";
+        }
+
+        for(Future<String> fut : list){
+            try {
+
+                fut.get();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        executor.shutdown();
+    }
+
     public void readFromFolder(String path, String finalPath) throws IOException {
 
         ExecutorService executor = Executors.newFixedThreadPool(10);
 
         List<Future<String>> list = new ArrayList<Future<String>>();
+
+
 
 
 
@@ -86,11 +117,14 @@ public class FileServiceImpl implements FileService {
         log.log(Level.INFO,"Start reading from file");
         String text = FileUtils.readFileToString(file);
         String[] words = text.split(" ");
+        if (file.getName().equals("test.txt")){
+            System.out.println("sdf");
+        }
         int count = 0;
         for (int i = 0; i < words.length; i++){
             if (StringUtils.isNumeric(words[i])){
                 int number = Integer.parseInt(words[i]);
-                if (number > 100 && number < 99999){
+                if (number > 99 && number < 100000){
                     count++;
                 }
             }
